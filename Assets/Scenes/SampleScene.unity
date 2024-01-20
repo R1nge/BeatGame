@@ -353,9 +353,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 1566447919}
-  fftBufferSize: 1024
-  samplingRate: 44100
-  sensitivity: 0.1
+  bufferSize: 1024
+  gThresh: 0.1
+  amplificationFactor: 100
   onBeat:
     m_PersistentCalls:
       m_Calls: []
@@ -373,7 +373,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: cde777487ffea2b4aafd294aad9807c3, type: 3}
-  m_PlayOnAwake: 0
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
