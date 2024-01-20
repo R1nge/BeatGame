@@ -21,11 +21,8 @@ public class Example : MonoBehaviour
     private void Awake()
     {
         AudioProcessor processor = FindObjectOfType<AudioProcessor>();
-        processor.onBeat.AddListener(BeatDetected);
         processor.onSpectrum.AddListener(SpectrumChanged);
     }
-
-    private void BeatDetected() => Debug.Log("Beat!!!");
 
     private void SpectrumChanged(float[] spectrum)
     {
