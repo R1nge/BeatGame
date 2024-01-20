@@ -1,4 +1,4 @@
-﻿namespace _Assets.Services.StateMachine
+﻿namespace _Assets.Scripts.Services.StateMachine
 {
     public interface IGameState : IExitState
     {

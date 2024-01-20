@@ -1,4 +1,4 @@
-﻿namespace _Assets.Services.StateMachine.States
+﻿namespace _Assets.Scripts.Services.StateMachine.States
 {
     public class GameState : IGameState
     {
