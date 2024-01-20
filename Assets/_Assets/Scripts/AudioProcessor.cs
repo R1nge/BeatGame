@@ -1,20 +1,4 @@
-﻿/*
- * Copyright (c) 2015 Allan Pichardo
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *  http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
@@ -72,6 +56,11 @@ public class AudioProcessor : MonoBehaviour
         _lastTimeMilliseconds = GetCurrentTimeMilliseconds();
     }
 
+    private void Start()
+    {
+        audioSource.Play();
+    }
+
     private void InitArrays()
     {
         _onsets = new float[ColumnMax];
@@ -119,7 +108,7 @@ public class AudioProcessor : MonoBehaviour
 
     private float CalculateSpectrumValue(int bandIndex)
     {
-        float spectrumValue = (float)Math.Max(-100.0f, 20.0f * (float)Math.Log10(_averages[bandIndex]) + 160);
+        float spectrumValue = Mathf.Max(-100.0f, 20.0f * Mathf.Log10(_averages[bandIndex]) + 160);
         spectrumValue *= 0.025f;
         return spectrumValue;
     }
@@ -127,27 +116,27 @@ public class AudioProcessor : MonoBehaviour
     private int UpdateAutoCorrelatorAndGetTempo()
     {
         _autoCorrelator.NewValue(_onsets[_currentColumnIndex]);
-        float aMax = 0.0f;
-        int tempopd = 0;
+        float max = 0.0f;
+        int tempo = 0;
 
         for (int i = 0; i < MaxFramesLagToTrack; ++i)
         {
-            float acVal = (float)Math.Sqrt(_autoCorrelator.CurrentAutoCorrelator(i));
-            if (acVal > aMax)
+            float current = Mathf.Sqrt(_autoCorrelator.CurrentAutoCorrelator(i));
+            if (current > max)
             {
-                aMax = acVal;
-                tempopd = i;
+                max = current;
+                tempo = i;
             }
         }
 
-        return tempopd;
+        return tempo;
     }
 
     private void UpdateScoreFunction(int tempo)
     {
         var scoreMax = -999999f;
 
-        for (int i = tempo / 2; i < Math.Min(ColumnMax, 2 * tempo); ++i)
+        for (int i = tempo / 2; i < Mathf.Min(ColumnMax, 2 * tempo); ++i)
         {
             float score = CalculateScore(tempo, i);
             if (score > scoreMax)
@@ -177,10 +166,11 @@ public class AudioProcessor : MonoBehaviour
     {
         float tempoPenaltyFactor = 100 * sensitivity;
         float score = _onsets[_currentColumnIndex] + _scores[(_currentColumnIndex - index + ColumnMax) % ColumnMax] -
-                      tempoPenaltyFactor * (float)Math.Pow(Math.Log((float)index / (float)tempo), 2);
+                      tempoPenaltyFactor * Mathf.Pow(Mathf.Log((float)index / (float)tempo), 2);
         return score;
     }
 
+    //TESTED
     private void CheckForBeat(int tempo)
     {
         var scoreMax = -999999f;
@@ -221,13 +211,13 @@ public class AudioProcessor : MonoBehaviour
         }
 
         // special case: freq is within the bandwidth of spectrum[512]
-        if (frequency > samplingRate / 2 - GetBandWidth() / 2)
+        if (frequency > samplingRate / 2f - GetBandWidth() / 2)
         {
             return fftBufferSize / 2;
         }
 
         float fraction = (float)frequency / (float)samplingRate;
-        int index = (int)Math.Round(fftBufferSize * fraction);
+        int index = Mathf.RoundToInt(fftBufferSize * fraction);
         return index;
     }
 
@@ -237,9 +227,9 @@ public class AudioProcessor : MonoBehaviour
         {
             float avg = 0;
 
-            var lowestFrequency = i == 0 ? 0 : Mathf.FloorToInt(samplingRate / 2 / (float)Math.Pow(2, 12 - i));
+            var lowestFrequency = i == 0 ? 0 : Mathf.FloorToInt(samplingRate / 2f / Mathf.Pow(2, 12 - i));
 
-            var highestFrequency = Mathf.FloorToInt(samplingRate / 2 / (float)Math.Pow(2, 11 - i));
+            var highestFrequency = Mathf.FloorToInt(samplingRate / 2f / Mathf.Pow(2, 11 - i));
             var lowestBound = FrequencyToIndex(lowestFrequency);
             var highestBound = FrequencyToIndex(highestFrequency);
 
@@ -334,7 +324,7 @@ public class AudioProcessor : MonoBehaviour
                 _BPMs[i] = 60.0f / (framePeriod * i);
                 // weighting is Gaussian on log-BPM axis, centered at wmidbpm, SD = woctavewidth octaves
                 _rweight[i] =
-                    (float)Math.Exp(-0.5f * Math.Pow(Math.Log(_BPMs[i] / Wmidbpm) / Math.Log(2.0f) / bandwidth, 2.0f));
+                    Mathf.Exp(-0.5f * Mathf.Pow(Mathf.Log(_BPMs[i] / Wmidbpm) / Mathf.Log(2.0f) / bandwidth, 2.0f));
             }
         }
 
